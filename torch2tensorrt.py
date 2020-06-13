@@ -19,11 +19,11 @@ from alexnet_tensorrt import alexnet
 
 def main():
     model = alexnet()
-    model = model.load_state_dict(torch.load("checkpoints/alexnet.pth")["state_dict"])
-    model = model.to("cuda:0")
+    model.load_state_dict(torch.load("checkpoints/alexnet.pth")["state_dict"])
+    model.to("cuda:0")
     model.eval()
 
-    f = open("alexnet.pb", "w")
+    f = open("checkpoints/alexnet.pb", "w")
     f.write("{}\n".format(len(model.state_dict().keys())))
     for k, v in model.state_dict().items():
         print("key: ", k)
@@ -34,6 +34,8 @@ def main():
             f.write(" ")
             f.write(struct.pack(">f", float(vv)).hex())
         f.write("\n")
+
+    print("Model convert successful!")
 
 
 if __name__ == "__main__":

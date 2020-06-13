@@ -70,7 +70,7 @@ ICudaEngine *createEngine(unsigned int maxBatchSize, IBuilder *builder, DataType
     ITensor *data = network->addInput(INPUT_BLOB_NAME, dt, Dims3{3, INPUT_H, INPUT_W});
     assert(data);
 
-    std::map<std::string, Weights> weightMap = loadWeights("../alexnet.wts");
+    std::map<std::string, Weights> weightMap = loadWeights("checkpoints/alexnet.pb");
     Weights emptywts{DataType::kFLOAT, nullptr, 0};
 
     // Add convolution layer with 6 outputs and a 5x5 filter.
@@ -215,9 +215,9 @@ void doInference(IExecutionContext &context, float *input, float *output, int ba
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        std::cerr << "arguments not right!" << std::endl;
-        std::cerr << "./alexnet -s   // serialize model to plan file" << std::endl;
-        std::cerr << "./alexnet -d   // deserialize plan file and run inference" << std::endl;
+        std::cerr << "Usage:" << std::endl;
+        std::cerr << "./AlexNet_TensorRT -s   // serialize model to plan file" << std::endl;
+        std::cerr << "./AlexNet_TensorRT -d   // deserialize plan file and run inference" << std::endl;
         return -1;
     }
 

@@ -11,7 +11,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(/usr/local/cuda-10.2/targets/x86_64-linux/include)
 link_directories(/usr/local/cuda-10.2/targets/x86_64-linux/lib)
 
-add_executable(AlexNet_TensorRT alexnet.cpp)
+add_executable(AlexNet_TensorRT
+        alexnet.cpp)
 target_link_libraries(AlexNet_TensorRT nvinfer)
 target_link_libraries(AlexNet_TensorRT cudart)
 
