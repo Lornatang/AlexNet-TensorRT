@@ -57,7 +57,7 @@ public:
 
     Logger() : Logger(Severity::kWARNING) {}
 
-    Logger(Severity severity) : reportableSeverity(severity) {}
+    explicit Logger(Severity severity) : reportableSeverity(severity) {}
 
     void log(Severity severity, const char *msg) override {
         // suppress messages with severity enum value greater than the reportable

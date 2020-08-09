@@ -11,23 +11,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+
 import struct
 
 import torch
-from alexnet_tensorrt import alexnet
+import torchvision
 
 
-def main():
-    model = alexnet()
-    model.load_state_dict(torch.load("checkpoints/alexnet.pth")["state_dict"])
-    model.to("cuda:0")
-    model.eval()
+def create_weights():
+    net = torchvision.models.alexnet(pretrained=True).to('cuda:0')
+    net.eval()
+    torch.save(net, "alexnet.pth")
+    del net
 
-    f = open("checkpoints/alexnet.pb", "w")
-    f.write("{}\n".format(len(model.state_dict().keys())))
-    for k, v in model.state_dict().items():
-        print("key: ", k)
-        print("value: ", v.shape)
+
+def convert_weights():
+    net = torch.load('alexnet.pth').to('cuda:0')
+    net.eval()
+
+    f = open("alexnet.weights", 'w')
+    f.write("{}\n".format(len(net.state_dict().keys())))
+    for k, v in net.state_dict().items():
         vr = v.reshape(-1).cpu().numpy()
         f.write("{} {}".format(k, len(vr)))
         for vv in vr:
@@ -35,6 +39,14 @@ def main():
             f.write(struct.pack(">f", float(vv)).hex())
         f.write("\n")
 
+
+def main():
+    print(f"cuda device count: {torch.cuda.device_count()}")
+
+    create_weights()
+    print("Create Model successful!")
+
+    convert_weights()
     print("Model convert successful!")
 
 

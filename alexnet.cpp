@@ -70,15 +70,15 @@ ICudaEngine *createEngine(unsigned int maxBatchSize, IBuilder *builder, DataType
     ITensor *data = network->addInput(INPUT_BLOB_NAME, dt, Dims3{3, INPUT_H, INPUT_W});
     assert(data);
 
-    std::map<std::string, Weights> weightMap = loadWeights("checkpoints/alexnet.pb");
+    std::map<std::string, Weights> weightMap = loadWeights("../alexnet.weights");
     Weights emptywts{DataType::kFLOAT, nullptr, 0};
 
     // Add convolution layer with 6 outputs and a 5x5 filter.
     IConvolutionLayer *conv1 = network->addConvolution(*data, 64, DimsHW{11, 11}, weightMap["features.0.weight"],
                                                        weightMap["features.0.bias"]);
     assert(conv1);
-    conv1->setStride(DimsHW{4, 4});
-    conv1->setPadding(DimsHW{2, 2});
+    conv1->setStrideNd(DimsHW{4, 4});
+    conv1->setPaddingNd(DimsHW{2, 2});
 
     // Add activation layer using the ReLU algorithm.
     IActivationLayer *relu1 = network->addActivation(*conv1->getOutput(0), ActivationType::kRELU);
@@ -87,7 +87,7 @@ ICudaEngine *createEngine(unsigned int maxBatchSize, IBuilder *builder, DataType
     // Add max pooling layer with stride of 2x2 and kernel size of 2x2.
     IPoolingLayer *pool1 = network->addPooling(*relu1->getOutput(0), PoolingType::kMAX, DimsHW{3, 3});
     assert(pool1);
-    pool1->setStride(DimsHW{2, 2});
+    pool1->setStrideNd(DimsHW{2, 2});
 
     IConvolutionLayer *conv2 = network->addConvolution(*pool1->getOutput(0), 192, DimsHW{5, 5},
                                                        weightMap["features.3.weight"], weightMap["features.3.bias"]);
