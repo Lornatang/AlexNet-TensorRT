@@ -1,6 +1,3 @@
-//
-// Created by unix on 2020/6/13.
-//
 #include "NvInfer.h"
 #include "cuda_runtime_api.h"
 #include "common.h"

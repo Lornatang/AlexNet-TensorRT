@@ -11,27 +11,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
+import argparse
+import os
 import struct
 
 import torch
-import torchvision
+from torchvision.models import alexnet
+
+from alexnet_pytorch import AlexNet
+
+parser = argparse.ArgumentParser(description="Convert from PyTorch weights to TensorRT weights")
+parser.add_argument("--num_classes", type=int, default=1000,
+                    help="number of dataset category.")
+
+if not os.path.exists("/opt/tensorrt_models/torch/alexnet"):
+    os.makedirs("/opt/tensorrt_models/torch/alexnet")  # make new output folder
 
 
-def create_weights():
-    net = torchvision.models.alexnet(pretrained=True).to('cuda:0')
-    net.eval()
-    torch.save(net, "alexnet.pth")
-    del net
+def main():
+    args = parser.parse_args()
+    if args.num_classes == 1000:
+        model = alexnet(pretrained=True).to("cuda:0")
+        print("Load the official pre-training weight successfully.")
+    else:
+        model = AlexNet(num_classes=args.num_classes).to("cuda:0")
+        model.load_state_dict(torch.load("/opt/tensorrt_models/torch/alexnet/alexnet.pth"))
+        print("Load the specified pre-training weight successfully.")
 
+    model.eval()
 
-def convert_weights():
-    net = torch.load('alexnet.pth').to('cuda:0')
-    net.eval()
-
-    f = open("alexnet.weights", 'w')
-    f.write("{}\n".format(len(net.state_dict().keys())))
-    for k, v in net.state_dict().items():
+    f = open("/opt/tensorrt_models/torch/alexnet/alexnet.wts", "w")
+    f.write("{}\n".format(len(model.state_dict().keys())))
+    for k, v in model.state_dict().items():
         vr = v.reshape(-1).cpu().numpy()
         f.write("{} {}".format(k, len(vr)))
         for vv in vr:
@@ -39,15 +50,7 @@ def convert_weights():
             f.write(struct.pack(">f", float(vv)).hex())
         f.write("\n")
 
-
-def main():
-    print(f"cuda device count: {torch.cuda.device_count()}")
-
-    create_weights()
-    print("Create Model successful!")
-
-    convert_weights()
-    print("Model convert successful!")
+    print("The weight conversion has been completed and saved to `/opt/tensorrt_models/torch/alexnet/alexnet.wts`.")
 
 
 if __name__ == "__main__":
