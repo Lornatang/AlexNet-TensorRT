@@ -28,6 +28,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -pthread")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 message(STATUS "C++17 support has been enabled by default.")
 
+# Set build mode
+set(CMAKE_BUILD_TYPE "Release")
+# Set install path
+set(CMAKE_INSTALL_PREFIX "/usr/local")
+
 # Use OpenCV
 find_package(OpenCV REQUIRED)
 message(STATUS "OpenCV library status:")
@@ -40,27 +45,39 @@ message(STATUS "CUDA library status:")
 message(STATUS "    version: ${CUDA_VERSION}")
 message(STATUS "    include path: ${CUDA_INCLUDE_DIRS}")
 
-# Add all headers location to your include paths
+# Add all headers/librarys location to your include paths
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${CUDA_INCLUDE_DIRS})
-
-# Add all librarys location to your include paths
+link_directories(/usr/local/include/tensorrt)
 link_directories(/usr/local/cuda/lib64)
+link_directories(/usr/local/lib/tensorrt)
 
-file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/alexnet.cpp)
+# Install weights.a library
+add_subdirectory(src)
+
+file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/*.cpp)
+file(GLOB HEADERS ${PROJECT_SOURCE_DIR}/include)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-# Link your application with all libraries
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} nvinfer cudart)
-
-target_include_directories(alexnet PRIVATE ${CMAKE_SOURCE_DIR}/include)
-set_target_properties(alexnet PROPERTIES PUBLIC_HEADER
-                                         ${CMAKE_SOURCE_DIR}/include/common.h)
+# Link all libraries file
+target_link_libraries(
+  ${PROJECT_NAME}
+  ${OpenCV_LIBS}
+  nvinfer
+  cudart
+  common
+  logging
+  load_weights
+  inference
+  create_alexnet_engine
+  serialize_alexnet_engine)
+# Link all include file
+target_include_directories(${PROJECT_NAME} PRIVATE ${HEADERS})
 
 # install configure
 install(
   TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION bin
-  PUBLIC_HEADER DESTINATION include/tensorrt/torch/alexnet)
+  PUBLIC_HEADER DESTINATION include/tensorrt)

@@ -54,7 +54,7 @@ cmake-build-debug
 *.wts
 
 # Data folder
-data/train
-data/val
+data/Caltech-101
+
 
 

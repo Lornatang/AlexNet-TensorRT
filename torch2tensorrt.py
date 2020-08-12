@@ -21,7 +21,7 @@ from torchvision.models import alexnet
 from alexnet_pytorch import AlexNet
 
 parser = argparse.ArgumentParser(description="Convert from PyTorch weights to TensorRT weights")
-parser.add_argument("--num_classes", type=int, default=1000,
+parser.add_argument("--num-classes", type=int, default=1000,
                     help="number of dataset category.")
 
 if not os.path.exists("/opt/tensorrt_models/torch/alexnet"):

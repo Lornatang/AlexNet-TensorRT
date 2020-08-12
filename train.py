@@ -19,7 +19,6 @@ that being said, evaluation is working.
 import argparse
 import os
 import random
-import shutil
 import time
 import warnings
 
@@ -160,6 +159,7 @@ def main_worker(gpu, ngpus_per_node, args):
             nn.ReLU(inplace=True),
             nn.Linear(4096, args.num_classes),
         )
+        args.lr = 0.01
     else:
         print(f"=> creating model.")
         model = AlexNet(num_classes=args.num_classes)
@@ -240,7 +240,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=(
-            train_sampler is None),
+                train_sampler is None),
         num_workers=args.workers, pin_memory=True, sampler=train_sampler)
 
     val_transforms = transforms.Compose([
@@ -281,7 +281,6 @@ def main_worker(gpu, ngpus_per_node, args):
                                                     and args.rank % ngpus_per_node == 0):
             save_checkpoint({
                 "epoch": epoch + 1,
-                "arch": args.arch,
                 "state_dict": model.state_dict(),
                 "best_acc1": best_acc1,
                 "optimizer": optimizer.state_dict(),
@@ -388,8 +387,7 @@ def validate(val_loader, model, criterion, args):
 def save_checkpoint(state, is_best, filename="checkpoint.pth"):
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(state["state_dict"],
-                        "/opt/tensorrt_models/torch/alexnet/alexnet.pth")
+        torch.save(state["state_dict"], "/opt/tensorrt_models/torch/alexnet/alexnet.pth")
 
 
 class AverageMeter(object):
