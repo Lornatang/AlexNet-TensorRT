@@ -48,9 +48,9 @@ parser.add_argument("--epochs", default=90, type=int, metavar="N",
                     help="number of total epochs to run")
 parser.add_argument("--start-epoch", default=0, type=int, metavar="N",
                     help="manual epoch number (useful on restarts)")
-parser.add_argument("-b", "--batch-size", default=128, type=int,
+parser.add_argument("-b", "--batch-size", default=256, type=int,
                     metavar="N",
-                    help="mini-batch size (default: 128), this is the total "
+                    help="mini-batch size (default: 256), this is the total "
                          "batch size of all GPUs on the current node when "
                          "using Data Parallel or Distributed Data Parallel")
 parser.add_argument("--lr", "--learning-rate", default=0.1, type=float,
@@ -82,7 +82,7 @@ parser.add_argument("--gpu", default=0, type=int,
                     help="GPU id to use.")
 parser.add_argument("--image_size", default=224, type=int,
                     help="image size")
-parser.add_argument("--num_classes", type=int, default=1000,
+parser.add_argument("--num-classes", type=int, default=1000,
                     help="number of dataset category.")
 parser.add_argument("--multiprocessing-distributed", action="store_true",
                     help="Use multi-processing distributed training to launch "
@@ -145,11 +145,23 @@ def main_worker(gpu, ngpus_per_node, args):
         dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
                                 world_size=args.world_size, rank=args.rank)
     # create model
-    if args.pretrained:
+    if args.pretrained and args.num_classes == 1000:
         model = alexnet(pretrained=True)
         print(f"=> using pre-trained model")
+    elif args.pretrained:
+        print(f"=> creating model and Fine-tuning pre-trained model.")
+        model = alexnet(pretrained=True)
+        model.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, args.num_classes),
+        )
     else:
-        print(f"=> creating model")
+        print(f"=> creating model.")
         model = AlexNet(num_classes=args.num_classes)
 
     if args.distributed:
