@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
   assert(filename != nullptr && "File does not exist");
 
   // Get Model ouput size
-  unsigned int number_classes = atoi(argv[3]);
+  int number_classes = atoi(argv[3]);
 
   IRuntime *runtime = createInferRuntime(gLogger);
   assert(runtime != nullptr);
