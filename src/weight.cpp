@@ -18,7 +18,7 @@
 
 using namespace nvinfer1;
 
-std::map<std::string, Weights> load_weights(const std::string file) {
+std::map<std::string, Weights> load_weights(const std::string &file) {
   std::map<std::string, Weights> weights;
 
   report_message(0);

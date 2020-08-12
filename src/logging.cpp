@@ -17,24 +17,28 @@
 #include "../include/logging.h"
 
 void report_message(unsigned int level) {
-  std::time_t now = time(0);
-  std::tm* ltm = localtime(&now);
+  std::time_t now = time(nullptr);
+  std::tm *ltm = localtime(&now);
   switch (level) {
     case 0:
       std::cout << "[INFO]"
-                << "(" << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec << "): ";
+                << "(" << ltm->tm_hour << ":" << ltm->tm_min << ":"
+                << ltm->tm_sec << "): ";
       break;
     case 1:
       std::cout << "[WARNING]"
-                << "(" << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec << "): ";
+                << "(" << ltm->tm_hour << ":" << ltm->tm_min << ":"
+                << ltm->tm_sec << "): ";
       break;
     case 2:
       std::cerr << "[ERROR]"
-                << "(" << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec << "): ";
+                << "(" << ltm->tm_hour << ":" << ltm->tm_min << ":"
+                << ltm->tm_sec << "): ";
       break;
     default:
       std::cout << "[INFO]"
-                << "(" << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec << "): ";
+                << "(" << ltm->tm_hour << ":" << ltm->tm_min << ":"
+                << ltm->tm_sec << "): ";
       break;
   }
 }

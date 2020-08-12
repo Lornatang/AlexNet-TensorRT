@@ -18,9 +18,10 @@
 
 using namespace nvinfer1;
 
-static Logger gLogger;
+static Logger gLogger; /* NOLINT */
 
-void serialize_alexnet_engine(unsigned int max_batch_size, IHostMemory **model_stream, unsigned int number_classes) {
+void serialize_alexnet_engine(int max_batch_size, IHostMemory **model_stream,
+                              int number_classes) {
   // Create builder
   report_message(0);
   std::cout << "Creating builder..." << std::endl;
@@ -30,7 +31,8 @@ void serialize_alexnet_engine(unsigned int max_batch_size, IHostMemory **model_s
   // Create model to populate the network, then set the outputs and create an engine
   report_message(0);
   std::cout << "Creating AlexNet network engine..." << std::endl;
-  ICudaEngine *engine = create_alexnet_engine(max_batch_size, builder, DataType::kFLOAT, config, number_classes);
+  ICudaEngine *engine = create_alexnet_engine(
+          max_batch_size, builder, DataType::kFLOAT, config, number_classes);
   assert(engine != nullptr);
 
   // Serialize the engine

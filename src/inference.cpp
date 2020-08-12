@@ -2,9 +2,10 @@
 
 using namespace nvinfer1;
 
-void inference(IExecutionContext &context, float *input, float *output, const char *input_name, const char *ouput_name,
-               const unsigned int batch_size, const unsigned int channel, const unsigned int image_height,
-               const unsigned int image_width, const unsigned int number_classes) {
+void inference(nvinfer1::IExecutionContext &context, float *input,
+               float *output, const char *input_name, const char *ouput_name,
+               int batch_size, unsigned int channel, unsigned int image_height,
+               unsigned int image_width, unsigned int number_classes) {
   const ICudaEngine &engine = context.getEngine();
 
   // Pointers to input and output device buffers to pass to engine.
@@ -19,8 +20,10 @@ void inference(IExecutionContext &context, float *input, float *output, const ch
   const int outputIndex = engine.getBindingIndex(ouput_name);
 
   // Create GPU buffers on device
-  CHECK(cudaMalloc(&buffers[inputIndex], batch_size * channel * image_height * image_width * sizeof(float)));
-  CHECK(cudaMalloc(&buffers[outputIndex], batch_size * number_classes * sizeof(float)));
+  CHECK(cudaMalloc(&buffers[inputIndex], batch_size * channel * image_height *
+                                                 image_width * sizeof(float)));
+  CHECK(cudaMalloc(&buffers[outputIndex],
+                   batch_size * number_classes * sizeof(float)));
 
   // Create stream
   cudaStream_t stream;
@@ -28,10 +31,13 @@ void inference(IExecutionContext &context, float *input, float *output, const ch
 
   // DMA input batch data to device, infer on the batch asynchronously, and DMA
   // output back to host
-  CHECK(cudaMemcpyAsync(buffers[inputIndex], input, batch_size * channel * image_height * image_width * sizeof(float),
+  CHECK(cudaMemcpyAsync(buffers[inputIndex], input,
+                        batch_size * channel * image_height * image_width *
+                                sizeof(float),
                         cudaMemcpyHostToDevice, stream));
   context.enqueue(batch_size, buffers, stream, nullptr);
-  CHECK(cudaMemcpyAsync(output, buffers[outputIndex], batch_size * number_classes * sizeof(float),
+  CHECK(cudaMemcpyAsync(output, buffers[outputIndex],
+                        batch_size * number_classes * sizeof(float),
                         cudaMemcpyDeviceToHost, stream));
   cudaStreamSynchronize(stream);
 

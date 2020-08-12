@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include <unistd.h>
-#include <cstdlib>
 #include "include/alexnet_engine.h"
 #include "include/alexnet_network.h"
 #include "include/common.h"
@@ -23,6 +21,8 @@
 #include "include/logging.h"
 #include "include/weight.h"
 #include "opencv2/opencv.hpp"
+#include <cstdlib>
+#include <unistd.h>
 
 // stuff we know about the network and the input/output blobs
 static const unsigned int BATCH_SIZE = 1;
@@ -37,15 +37,19 @@ const char *ENGINE_FILE = "/opt/tensorrt_models/torch/alexnet/alexnet.engine";
 
 using namespace nvinfer1;
 
-static Logger gLogger;
+static Logger gLogger; /* NOLINT */
 
 int main(int argc, char **argv) {
   if (argc < 2) {
     report_message(2);
     std::cerr << "Invalid arguments!" << std::endl;
     std::cout << "Usage: " << std::endl;
-    std::cout << "  alexnet --engine  <num_classes>// Generate TensorRT inference model." << std::endl;
-    std::cout << "  alexnet --image <image_path> <num_classes> // Reasoning on the picture." << std::endl;
+    std::cout << "  alexnet --engine <num_classes>// Generate TensorRT "
+                 "inference model."
+              << std::endl;
+    std::cout << "  alexnet --image <image_path> <num_classes> // Reasoning on "
+                 "the picture."
+              << std::endl;
     return -1;
   }
 
@@ -65,24 +69,29 @@ int main(int argc, char **argv) {
       report_message(2);
       std::cerr << "Could not open plan output file" << std::endl;
       report_message(0);
-      std::cout << "Please refer to the documentation how to generate an inference engine." << std::endl;
+      std::cout << "Please refer to the documentation how to generate an "
+                   "inference engine."
+                << std::endl;
       return -1;
     }
-    engine.write(reinterpret_cast<const char *>(model_stream->data()), model_stream->size());
+    engine.write(reinterpret_cast<const char *>(model_stream->data()),
+                 model_stream->size());
 
     report_message(0);
-    std::cout << "The inference engine is saved to `" << ENGINE_FILE << "`!" << std::endl;
+    std::cout << "The inference engine is saved to `" << ENGINE_FILE << "`!"
+              << std::endl;
 
     model_stream->destroy();
     return 1;
   } else if (std::string(argv[1]) == "--image") {
     report_message(0);
-    std::cout << "Read from`" << ENGINE_FILE << "` inference engine." << std::endl;
+    std::cout << "Read from`" << ENGINE_FILE << "` inference engine."
+              << std::endl;
     std::ifstream file(ENGINE_FILE, std::ios::binary);
     if (file.good()) {
-      file.seekg(0, file.end);
+      file.seekg(0, std::ifstream::end);
       size = file.tellg();
-      file.seekg(0, file.beg);
+      file.seekg(0, std::ifstream::beg);
       trtModelStream = new char[size];
       assert(trtModelStream);
       file.read(trtModelStream, size);
@@ -101,7 +110,8 @@ int main(int argc, char **argv) {
 
   IRuntime *runtime = createInferRuntime(gLogger);
   assert(runtime != nullptr);
-  ICudaEngine *engine = runtime->deserializeCudaEngine(trtModelStream, size, nullptr);
+  ICudaEngine *engine =
+          runtime->deserializeCudaEngine(trtModelStream, size, nullptr);
   assert(engine != nullptr);
   IExecutionContext *context = engine->createExecutionContext();
   assert(context != nullptr);
@@ -130,9 +140,12 @@ int main(int argc, char **argv) {
   image = (image - 127.5) / 128;
   for (int i = 0; i < image.rows; ++i) {
     for (int j = 0; j < image.cols; ++j) {
-      data[0 * INPUT_H * INPUT_W + i * INPUT_H + j] = static_cast<float>(image.at<cv::Vec3b>(i, j)[0]);
-      data[1 * INPUT_H * INPUT_W + i * INPUT_H + j] = static_cast<float>(image.at<cv::Vec3b>(i, j)[1]);
-      data[2 * INPUT_H * INPUT_W + i * INPUT_H + j] = static_cast<float>(image.at<cv::Vec3b>(i, j)[2]);
+      data[0 * INPUT_H * INPUT_W + i * INPUT_H + j] =
+              static_cast<float>(image.at<cv::Vec3b>(i, j)[0]);
+      data[1 * INPUT_H * INPUT_W + i * INPUT_H + j] =
+              static_cast<float>(image.at<cv::Vec3b>(i, j)[1]);
+      data[2 * INPUT_H * INPUT_W + i * INPUT_H + j] =
+              static_cast<float>(image.at<cv::Vec3b>(i, j)[2]);
     }
   }
 
@@ -143,7 +156,8 @@ int main(int argc, char **argv) {
   std::cout << "Inference......" << std::endl;
   for (int i = 0; i < 1000; i++) {
     auto start = std::chrono::system_clock::now();
-    inference(*context, data, prob, INPUT_NAME, OUTPUT_NAME, BATCH_SIZE, INPUT_C, INPUT_H, INPUT_W, number_classes);
+    inference(*context, data, prob, INPUT_NAME, OUTPUT_NAME, BATCH_SIZE,
+              INPUT_C, INPUT_H, INPUT_W, number_classes);
     auto end = std::chrono::system_clock::now();
   }
 

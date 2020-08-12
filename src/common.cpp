@@ -18,34 +18,42 @@
 
 using namespace std;
 
-vector<string> load_mnist_labels(string filename) {
+vector<string> load_mnist_labels(const string &filename) {
   vector<string> labels;
   ifstream labels_file(filename.c_str());
   string line;
-  while (getline(labels_file, line)) labels.push_back(string(line));
+  while (getline(labels_file, line)) labels.emplace_back(line);
 
   return labels;
 }
 
-void output_inference_results(float* prob, std::vector<std::string> labels, const unsigned int NUMBER_CLASSES) {
+void output_inference_results(float *prob, vector<string> labels,
+                              int number_classes) {
   // Calculate the probability of the top 5 categories
   std::vector<float> probs;
-  std::vector<std::pair<float, int> > pairs;
+  std::vector<std::pair<float, int>> pairs;
   std::vector<int> results;
 
-  for (int n = 0; n < NUMBER_CLASSES; n++) probs.push_back(prob[n]);
+  probs.reserve(number_classes);
+  for (int n = 0; n < number_classes; n++) { probs.push_back(prob[n]); }
 
   // Sort the categories in the array
-  for (size_t i = 0; i < probs.size(); ++i) pairs.push_back(std::make_pair(probs[i], i));
-  std::partial_sort(pairs.begin(), pairs.begin() + 5, pairs.end(), pair_compare);
+  pairs.reserve(probs.size());
+  for (size_t i = 0; i < probs.size(); ++i) { pairs.emplace_back(probs[i], i); }
+  std::partial_sort(pairs.begin(), pairs.begin() + 5, pairs.end(),
+                    pair_compare);
 
   // Formatted output and display
-  std::cout << std::left << std::setw(20) << "--------" << std::right << std::setw(12) << "-----------" << std::endl;
-  std::cout << std::left << std::setw(20) << "Category" << std::right << std::setw(12) << "probability" << std::endl;
-  std::cout << std::left << std::setw(20) << "--------" << std::right << std::setw(12) << "-----------" << std::endl;
+  std::cout << std::left << std::setw(30) << "--------" << std::right
+            << std::setw(12) << "-----------" << std::endl;
+  std::cout << std::left << std::setw(30) << "Category" << std::right
+            << std::setw(12) << "probability" << std::endl;
+  std::cout << std::left << std::setw(30) << "--------" << std::right
+            << std::setw(12) << "-----------" << std::endl;
   for (int i = 0; i < 5; ++i) {
     results.push_back(pairs[i].second);
-    std::cout << std::left << std::setw(20) << labels[pairs[i].second] << std::right << std::setw(9)
-              << prob[pairs[i].second] / 100 << std::endl;
+    std::cout << std::left << std::setw(30) << labels[pairs[i].second]
+              << std::right << std::setw(9) << prob[pairs[i].second] / 100
+              << std::endl;
   }
 }

@@ -21,7 +21,8 @@
 #include "alexnet_network.h"
 #include "logging.h"
 
-void serialize_alexnet_engine(unsigned int max_batch_size, nvinfer1::IHostMemory **model_stream,
-                              unsigned int number_classes);
+void serialize_alexnet_engine(int max_batch_size,
+                              nvinfer1::IHostMemory **model_stream,
+                              int number_classes);
 
-#endif  // ALEXNET_ENGINE_H
+#endif// ALEXNET_ENGINE_H

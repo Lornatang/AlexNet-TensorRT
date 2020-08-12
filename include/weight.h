@@ -17,12 +17,12 @@
 #ifndef WEIGHT_H
 #define WEIGHT_H
 
-#include <assert.h>
-#include <fstream>
-#include <map>
 #include "NvInfer.h"
 #include "logging.h"
+#include <cassert>
+#include <fstream>
+#include <map>
 
-std::map<std::string, nvinfer1::Weights> load_weights(const std::string file);
+std::map<std::string, nvinfer1::Weights> load_weights(const std::string &file);
 
-#endif  // WEIGHT_H
+#endif// WEIGHT_H

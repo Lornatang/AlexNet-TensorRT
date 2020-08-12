@@ -17,18 +17,18 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+#include "NvInfer.h"
 #include <ctime>
 #include <iostream>
-#include "NvInfer.h"
 
 // Logger for TensorRT info/warning/errors
 class Logger : public nvinfer1::ILogger {
- public:
+  public:
   Logger() : Logger(Severity::kWARNING) {}
 
-  Logger(Severity severity) : reportableSeverity(severity) {}
+  explicit Logger(Severity severity) : reportableSeverity(severity) {}
 
-  void log(Severity severity, const char* message) override {
+  void log(Severity severity, const char *message) override {
     // suppress messages with severity enum value greater than the reportable
     if (severity > reportableSeverity) return;
 
@@ -57,4 +57,4 @@ class Logger : public nvinfer1::ILogger {
 
 void report_message(unsigned int level);
 
-#endif  // LOGGING_H
+#endif// LOGGING_H

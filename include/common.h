@@ -17,42 +17,56 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include "NvInfer.h"
 #include <algorithm>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <vector>
-#include "NvInfer.h"
 
-#define CHECK(status)                       \
-  do {                                      \
-    auto ret = (status);                    \
-    if (ret != 0) {                         \
-      std::cout << "Cuda failure: " << ret; \
-      abort();                              \
-    }                                       \
+#define CHECK(status)                                                          \
+  do {                                                                         \
+    auto ret = (status);                                                       \
+    if (ret != 0) {                                                            \
+      std::cout << "Cuda failure: " << ret;                                    \
+      abort();                                                                 \
+    }                                                                          \
   } while (0)
 
-constexpr long double operator"" _GiB(long double val) { return val * (1 << 30); }
-constexpr long double operator"" _MiB(long double val) { return val * (1 << 20); }
-constexpr long double operator"" _KiB(long double val) { return val * (1 << 10); }
+constexpr long double operator"" _GiB(long double val) {
+  return val * (1 << 30); /* NOLINT */
+}
+constexpr long double operator"" _MiB(long double val) {
+  return val * (1 << 20); /* NOLINT */
+}
+constexpr long double operator"" _KiB(long double val) {
+  return val * (1 << 10); /* NOLINT */
+}
 
 // These is necessary if we want to be able to write 1_GiB instead of 1.0_GiB.
 // Since the return type is signed, -1_GiB will work as expected.
-constexpr long long int operator"" _GiB(long long unsigned int val) { return val * (1 << 30); }
-constexpr long long int operator"" _MiB(long long unsigned int val) { return val * (1 << 20); }
-constexpr long long int operator"" _KiB(long long unsigned int val) { return val * (1 << 10); }
+constexpr long long int operator"" _GiB(long long unsigned int val) {
+  return val * (1 << 30); /* NOLINT */
+}
+constexpr long long int operator"" _MiB(long long unsigned int val) {
+  return val * (1 << 20); /* NOLINT */
+}
+constexpr long long int operator"" _KiB(long long unsigned int val) {
+  return val * (1 << 10); /* NOLINT */
+}
 
 // Load MNIST dataset label
-std::vector<std::string> load_mnist_labels(std::string filename);
+std::vector<std::string> load_mnist_labels(const std::string &filename);
 
 // Calculate the probability of the top 5 categories
-void output_inference_results(float* prob, std::vector<std::string> labels, const unsigned int NUMBER_CLASSES);
+void output_inference_results(float *prob, std::vector<std::string> labels,
+                              int number_classes);
 
 // Similar to the processing of dictionary types in Python
-static bool pair_compare(const std::pair<float, int>& lhs, const std::pair<float, int>& rhs) {
+static bool pair_compare(const std::pair<float, int> &lhs,
+                         const std::pair<float, int> &rhs) {
   return lhs.first > rhs.first;
 }
 
-#endif  // COMMON_H
+#endif// COMMON_H

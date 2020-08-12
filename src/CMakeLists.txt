@@ -55,30 +55,24 @@ add_library(serialize_alexnet_engine engine.cpp)
 target_include_directories(common PUBLIC ../include)
 
 # Install  all static library
-install(
-  TARGETS common
-  ARCHIVE DESTINATION lib/tensorrt
-  PUBLIC_HEADER DESTINATION include/tensorrt)
-install(
-  TARGETS logging
-  ARCHIVE DESTINATION lib/tensorrt
-  PUBLIC_HEADER DESTINATION include/tensorrt)
-install(
-  TARGETS load_weights
-  ARCHIVE DESTINATION lib/tensorrt
-  PUBLIC_HEADER DESTINATION include/tensorrt)
-install(
-  TARGETS inference
-  ARCHIVE DESTINATION lib/tensorrt
-  PUBLIC_HEADER DESTINATION include/tensorrt)
-install(
-  TARGETS create_alexnet_engine
-  ARCHIVE DESTINATION lib/tensorrt
-  PUBLIC_HEADER DESTINATION include/tensorrt)
-install(
-  TARGETS serialize_alexnet_engine
-  ARCHIVE DESTINATION lib/tensorrt
-  PUBLIC_HEADER DESTINATION include/tensorrt)
+install(TARGETS common
+        ARCHIVE DESTINATION lib/tensorrt
+        PUBLIC_HEADER DESTINATION include/tensorrt)
+install(TARGETS logging
+        ARCHIVE DESTINATION lib/tensorrt
+        PUBLIC_HEADER DESTINATION include/tensorrt)
+install(TARGETS load_weights
+        ARCHIVE DESTINATION lib/tensorrt
+        PUBLIC_HEADER DESTINATION include/tensorrt)
+install(TARGETS inference
+        ARCHIVE DESTINATION lib/tensorrt
+        PUBLIC_HEADER DESTINATION include/tensorrt)
+install(TARGETS create_alexnet_engine
+        ARCHIVE DESTINATION lib/tensorrt
+        PUBLIC_HEADER DESTINATION include/tensorrt)
+install(TARGETS serialize_alexnet_engine
+        ARCHIVE DESTINATION lib/tensorrt
+        PUBLIC_HEADER DESTINATION include/tensorrt)
 install(FILES ../include/common.h DESTINATION include/tensorrt)
 install(FILES ../include/logging.h DESTINATION include/tensorrt)
 install(FILES ../include/weight.h DESTINATION include/tensorrt)
@@ -92,12 +86,12 @@ target_link_libraries(logging ${OpenCV_LIBS} nvinfer cudart)
 target_link_libraries(load_weights ${OpenCV_LIBS} nvinfer cudart logging)
 target_link_libraries(inference ${OpenCV_LIBS} nvinfer cudart)
 target_link_libraries(create_alexnet_engine ${OpenCV_LIBS} nvinfer cudart
-                      logging load_weights)
+        logging load_weights)
 target_link_libraries(
-  serialize_alexnet_engine
-  ${OpenCV_LIBS}
-  nvinfer
-  cudart
-  logging
-  load_weights
-  create_alexnet_engine)
+        serialize_alexnet_engine
+        ${OpenCV_LIBS}
+        nvinfer
+        cudart
+        logging
+        load_weights
+        create_alexnet_engine)

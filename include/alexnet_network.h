@@ -22,8 +22,10 @@
 #include "logging.h"
 #include "weight.h"
 
-nvinfer1::ICudaEngine *create_alexnet_engine(unsigned int max_batch_size, nvinfer1::IBuilder *builder,
-                                             nvinfer1::DataType data_type, nvinfer1::IBuilderConfig *config,
-                                             unsigned int number_classes);
+nvinfer1::ICudaEngine *create_alexnet_engine(int max_batch_size,
+                                             nvinfer1::IBuilder *builder,
+                                             nvinfer1::DataType data_type,
+                                             nvinfer1::IBuilderConfig *config,
+                                             int number_classes);
 
-#endif  // ALEXNET_MODEL_H
+#endif// ALEXNET_MODEL_H
