@@ -15,12 +15,11 @@
  */
 
 #include "include/alexnet_engine.h"
-#include "include/alexnet_network.h"
-#include "include/common.h"
-#include "include/inference.h"
-#include "include/logging.h"
-#include "include/weight.h"
 #include "opencv2/opencv.hpp"
+#include "tensorrt/common.h"
+#include "tensorrt/inference.h"
+#include "tensorrt/logging.h"
+#include "tensorrt/weight.h"
 #include <cstdlib>
 #include <unistd.h>
 
@@ -61,7 +60,7 @@ int main(int argc, char **argv) {
     IHostMemory *model_stream{nullptr};
     report_message(0);
     std::cout << "Start serialize AlexNet network engine." << std::endl;
-    serialize_alexnet_engine(1, &model_stream, atoi(argv[2]));
+    create_alexnet_engine(1, &model_stream, atoi(argv[2]));
     assert(model_stream != nullptr);
 
     std::ofstream engine(ENGINE_FILE);
@@ -74,19 +73,16 @@ int main(int argc, char **argv) {
                 << std::endl;
       return -1;
     }
-    engine.write(reinterpret_cast<const char *>(model_stream->data()),
-                 model_stream->size());
+    engine.write(reinterpret_cast<const char *>(model_stream->data()), model_stream->size());
 
     report_message(0);
-    std::cout << "The inference engine is saved to `" << ENGINE_FILE << "`!"
-              << std::endl;
+    std::cout << "The inference engine is saved to `" << ENGINE_FILE << "`!" << std::endl;
 
     model_stream->destroy();
     return 1;
   } else if (std::string(argv[1]) == "--image") {
     report_message(0);
-    std::cout << "Read from`" << ENGINE_FILE << "` inference engine."
-              << std::endl;
+    std::cout << "Read from`" << ENGINE_FILE << "` inference engine." << std::endl;
     std::ifstream file(ENGINE_FILE, std::ios::binary);
     if (file.good()) {
       file.seekg(0, std::ifstream::end);
@@ -110,8 +106,7 @@ int main(int argc, char **argv) {
 
   IRuntime *runtime = createInferRuntime(gLogger);
   assert(runtime != nullptr);
-  ICudaEngine *engine =
-          runtime->deserializeCudaEngine(trtModelStream, size, nullptr);
+  ICudaEngine *engine = runtime->deserializeCudaEngine(trtModelStream, size, nullptr);
   assert(engine != nullptr);
   IExecutionContext *context = engine->createExecutionContext();
   assert(context != nullptr);
@@ -140,12 +135,9 @@ int main(int argc, char **argv) {
   image = (image - 127.5) / 128;
   for (int i = 0; i < image.rows; ++i) {
     for (int j = 0; j < image.cols; ++j) {
-      data[0 * INPUT_H * INPUT_W + i * INPUT_H + j] =
-              static_cast<float>(image.at<cv::Vec3b>(i, j)[0]);
-      data[1 * INPUT_H * INPUT_W + i * INPUT_H + j] =
-              static_cast<float>(image.at<cv::Vec3b>(i, j)[1]);
-      data[2 * INPUT_H * INPUT_W + i * INPUT_H + j] =
-              static_cast<float>(image.at<cv::Vec3b>(i, j)[2]);
+      data[0 * INPUT_H * INPUT_W + i * INPUT_H + j] = static_cast<float>(image.at<cv::Vec3b>(i, j)[0]);
+      data[1 * INPUT_H * INPUT_W + i * INPUT_H + j] = static_cast<float>(image.at<cv::Vec3b>(i, j)[1]);
+      data[2 * INPUT_H * INPUT_W + i * INPUT_H + j] = static_cast<float>(image.at<cv::Vec3b>(i, j)[2]);
     }
   }
 
@@ -156,8 +148,7 @@ int main(int argc, char **argv) {
   std::cout << "Inference......" << std::endl;
   for (int i = 0; i < 1000; i++) {
     auto start = std::chrono::system_clock::now();
-    inference(*context, data, prob, INPUT_NAME, OUTPUT_NAME, BATCH_SIZE,
-              INPUT_C, INPUT_H, INPUT_W, number_classes);
+    inference(*context, data, prob, INPUT_NAME, OUTPUT_NAME, BATCH_SIZE, INPUT_C, INPUT_H, INPUT_W, number_classes);
     auto end = std::chrono::system_clock::now();
   }
 

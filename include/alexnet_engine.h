@@ -18,11 +18,14 @@
 #define ALEXNET_ENGINE_H
 
 #include "NvInfer.h"
-#include "alexnet_network.h"
-#include "logging.h"
+#include "tensorrt/common.h"
+#include "tensorrt/logging.h"
+#include "tensorrt/weight.h"
 
-void serialize_alexnet_engine(int max_batch_size,
-                              nvinfer1::IHostMemory **model_stream,
-                              int number_classes);
+nvinfer1::ICudaEngine *create_alexnet_network(int max_batch_size, nvinfer1::IBuilder *builder,
+                                              nvinfer1::DataType data_type, nvinfer1::IBuilderConfig *config,
+                                              int number_classes);
+
+void create_alexnet_engine(int max_batch_size, nvinfer1::IHostMemory **model_stream, int number_classes);
 
 #endif// ALEXNET_ENGINE_H

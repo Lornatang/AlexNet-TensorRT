@@ -19,7 +19,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 # The name of the project
 set(PROJECT_NAME alexnet)
-project(${PROJECT_NAME} VERSION 0.1)
+project(${PROJECT_NAME} VERSION 0.0.1)
 
 # Compile using C++17 standard
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
@@ -46,38 +46,32 @@ message(STATUS "    version: ${CUDA_VERSION}")
 message(STATUS "    include path: ${CUDA_INCLUDE_DIRS}")
 
 # Add all headers/librarys location to your include paths
-include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${CUDA_INCLUDE_DIRS})
-link_directories(/usr/local/include/tensorrt)
 link_directories(/usr/local/cuda/lib64)
 link_directories(/usr/local/lib/tensorrt)
 
-# Install weights.a library
+# Install all library
 add_subdirectory(src)
 
 file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/*.cpp)
-file(GLOB HEADERS ${PROJECT_SOURCE_DIR}/include)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # Link all libraries file
 target_link_libraries(
-  ${PROJECT_NAME}
-  ${OpenCV_LIBS}
-  nvinfer
-  cudart
-  common
-  logging
-  load_weights
-  inference
-  create_alexnet_engine
-  serialize_alexnet_engine)
-# Link all include file
-target_include_directories(${PROJECT_NAME} PRIVATE ${HEADERS})
+        ${PROJECT_NAME}
+        ${OpenCV_LIBS}
+        nvinfer
+        cudart
+        tensorrt_common
+        tensorrt_logging
+        tensorrt_load_weights
+        tensorrt_inference
+        tensorrt_alexnet_engine)
 
 # install configure
 install(
-  TARGETS ${PROJECT_NAME}
-  RUNTIME DESTINATION bin
-  PUBLIC_HEADER DESTINATION include/tensorrt)
+        TARGETS ${PROJECT_NAME}
+        RUNTIME DESTINATION bin
+        PUBLIC_HEADER DESTINATION include/tensorrt)
