@@ -36,6 +36,15 @@ Both of these samples use the same model weights, handle the same input, and exp
 #### Clone and install requirements
 
 ```bash
+# Install TensorRT-DevelopmentKit
+wget https://github.com/Lornatang/TensorRT-Toolkit/archive/TensorRT-ToolKit-v1.1.0.tar.gz
+tar xzcf TensorRT-ToolKit-v1.1.0.tar.gz
+cd TensorRT-Toolkit-TensorRT-ToolKit-v1.1.0
+mkdir build && cd build
+cmake ..
+sudo make install
+
+# Install this repo
 git clone https://github.com/Lornatang/AlexNet-TensorRT.git
 cd AlexNet-TensorRT/
 pip install -r requirements.txt
